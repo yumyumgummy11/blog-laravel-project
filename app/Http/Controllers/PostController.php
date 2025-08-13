@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Http\Requests\PostFormRequest;
+use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
@@ -21,9 +22,8 @@ class PostController extends Controller
     public function store(PostFormRequest $request)
     {
         $data = $request->validated();
-
-        $post = Post::create($data);
-
+        $post = $request->user()->posts()->create($data);
+    
         return redirect()->route('posts.show', [$post])->with('success', 'Post Submited! Title: ' . $post->title . ' Description: ' . $post->description);
     }
 
@@ -38,16 +38,22 @@ class PostController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Post $post)
+    public function edit(Request $request, Post $post)
     {
+        if ($request->user()->cannot('update', $post)) {
+            abort(403);
+        }
         return view('posts.edit', ['post' => $post]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(PostFormRequest $request, $post)
+    public function update(Request $test, PostFormRequest $request, Post $post) 
     {
+        if ($test->user()->cannot('delete', $post)) {
+            abort(403);
+        }
         $data = $request->validated();
 
         $post->update($data);
@@ -58,8 +64,11 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy(Request $request, Post $post)
     {
+        if ($request->user()->cannot('delete', $post)) {
+            abort(403);
+        }
         $post->delete();
 
         return redirect()->route('home')->with('success', 'Post Deleted');
