@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Post;
+use App\Http\Requests\PostFormRequest;
 
 class PostController extends Controller
 {
@@ -17,45 +18,50 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(PostFormRequest $request)
     {
-        $request->validate([
-            'title' => 'required',
-            'description' => ['required', 'min:10']
-        ]);
+        $data = $request->validated();
 
-        return redirect()->route('posts.create')->with('success', 'Post Submited! Title: ' . $request->input('title') . ' Description: ' . $request->input('description'));
+        $post = Post::create($data);
+
+        return redirect()->route('posts.show', [$post])->with('success', 'Post Submited! Title: ' . $post->title . ' Description: ' . $post->description);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Post $post)
     {
-        //
+        return view('posts.show', ['post' => $post]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Post $post)
     {
-        //
+        return view('posts.edit', ['post' => $post]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(PostFormRequest $request, $post)
     {
-        //
+        $data = $request->validated();
+
+        $post->update($data);
+
+        return redirect()->route('posts.show', [$post])->with('success', 'Post Updated');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Post $post)
     {
-        //
+        $post->delete();
+
+        return redirect()->route('home')->with('success', 'Post Deleted');
     }
 }

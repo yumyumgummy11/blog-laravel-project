@@ -3,7 +3,6 @@
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 
 Route::get('/', [HomeController::class, 'home'])->name('home');
 
