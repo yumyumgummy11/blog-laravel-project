@@ -20,5 +20,7 @@
         @endcan
         <small>Posted by: <b>{{ $post->user->name }}</b></small>
     </div>
+    @include('/comments/create', [$post])
+    @include('/comments/show', [$comments])
 </div>
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Http\Requests\PostFormRequest;
 use Illuminate\Http\Request;
+use App\Models\Comment;
 
 class PostController extends Controller
 {
@@ -32,7 +33,9 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return view('posts.show', ['post' => $post]);
+        $comments = Comment::all();
+
+        return view('posts.show', ['post' => $post, 'comments' => $comments]);
     }
 
     /**
@@ -51,7 +54,7 @@ class PostController extends Controller
      */
     public function update(Request $test, PostFormRequest $request, Post $post) 
     {
-        if ($test->user()->cannot('delete', $post)) {
+        if ($test->user()->cannot('update', $post)) {
             abort(403);
         }
         $data = $request->validated();
